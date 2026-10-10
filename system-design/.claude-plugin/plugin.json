@@ -1,0 +1,9 @@
+{
+  "name": "system-design",
+  "description": "Candid system-design evaluations of technologies: advantages, limitations, tradeoffs, and a structured rating.",
+  "version": "0.1.0",
+  "author": {
+    "name": "alexgrossidev"
+  },
+  "license": "MIT"
+}

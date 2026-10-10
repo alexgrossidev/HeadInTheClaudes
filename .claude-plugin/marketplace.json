@@ -1,0 +1,16 @@
+{
+  "name": "head-in-the-claude",
+  "owner": {
+    "name": "alexgrossidev"
+  },
+  "metadata": {
+    "description": "Skills and workflows I use with Claude to develop software better and faster."
+  },
+  "plugins": [
+    {
+      "name": "system-design",
+      "source": "./system-design",
+      "description": "Candid system-design evaluations of technologies: advantages, limitations, tradeoffs, and a structured rating."
+    }
+  ]
+}
