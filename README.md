@@ -1,4 +1,4 @@
-# Head in the Claude
+# Head in the Claudes
 
 A generalised library of skills and workflows I use with Claude to develop software better and faster.
 
@@ -16,8 +16,8 @@ Each top-level folder is a **domain**, packaged as a Claude Code plugin. Each do
 ### As a Claude Code plugin
 
 ```
-/plugin marketplace add alexgrossidev/HeadInTheClaude
-/plugin install system-design@head-in-the-claude
+/plugin marketplace add alexgrossidev/HeadInTheClaudes
+/plugin install system-design@head-in-the-claudes
 ```
 
 ### As local skills (for hacking on them)
@@ -25,8 +25,8 @@ Each top-level folder is a **domain**, packaged as a Claude Code plugin. Each do
 Clone the repo and symlink every skill into `~/.claude/skills`:
 
 ```sh
-git clone https://github.com/alexgrossidev/HeadInTheClaude.git
-cd HeadInTheClaude
+git clone https://github.com/alexgrossidev/HeadInTheClaudes.git
+cd HeadInTheClaudes
 link-local.sh                     # symlinks every skill into ~/.claude/skills
 ```
 
