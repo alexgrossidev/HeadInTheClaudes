@@ -1,0 +1,899 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ticking Tasks Off Proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!--
+  idea-proposal deck template.
+  Fill every {{PLACEHOLDER}}. Duplicate or delete sample rows/cards as needed.
+  Keep the structure, classes and script. Escape < > & inside <pre><code>.
+  Verdict classes: verdict--build | verdict--smaller | verdict--park | verdict--no
+  Severity classes: sev--high | sev--med | sev--low
+  Priority classes: pri--mvp | pri--later | pri--cut
+  Tag classes: tag--evidence | tag--assumption | tag--speculative
+-->
+<style>
+:root {
+  --bg: #f4f5f7;
+  --slide: #ffffff;
+  --ink: #14171f;
+  --ink-2: #4a5161;
+  --ink-3: #7b8394;
+  --line: #e3e6ec;
+  --accent: #1f4fd1;
+  --accent-soft: #e8eefc;
+  --good: #11804a;
+  --good-soft: #e3f4ea;
+  --warn: #a35d00;
+  --warn-soft: #fbf0dd;
+  --bad: #b42318;
+  --bad-soft: #fde8e6;
+  --neutral-soft: #eef0f3;
+  --code-bg: #0f1420;
+  --code-ink: #d7deea;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 8px 24px rgba(16, 24, 40, .06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b0d12;
+    --slide: #141821;
+    --ink: #eef1f6;
+    --ink-2: #b4bbc8;
+    --ink-3: #808999;
+    --line: #262c38;
+    --accent: #7b9cff;
+    --accent-soft: #1b2440;
+    --good: #4cc98a;
+    --good-soft: #13281e;
+    --warn: #f0b252;
+    --warn-soft: #2d2311;
+    --bad: #ff7a6e;
+    --bad-soft: #321613;
+    --neutral-soft: #1c212b;
+    --code-bg: #0a0d14;
+    --code-ink: #d7deea;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .3);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b0d12;
+  --slide: #141821;
+  --ink: #eef1f6;
+  --ink-2: #b4bbc8;
+  --ink-3: #808999;
+  --line: #262c38;
+  --accent: #7b9cff;
+  --accent-soft: #1b2440;
+  --good: #4cc98a;
+  --good-soft: #13281e;
+  --warn: #f0b252;
+  --warn-soft: #2d2311;
+  --bad: #ff7a6e;
+  --bad-soft: #321613;
+  --neutral-soft: #1c212b;
+  --code-bg: #0a0d14;
+  --code-ink: #d7deea;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .3);
+}
+
+* { box-sizing: border-box; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 16px/1.55 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Slides */
+.slide {
+  scroll-snap-align: start;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px 72px;
+}
+.slide__inner {
+  width: 100%;
+  max-width: 1120px;
+  background: var(--slide);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: clamp(24px, 4vw, 56px);
+  position: relative;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 900ms ease, transform 900ms ease;
+}
+.slide.is-visible .slide__inner { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .slide__inner { opacity: 1; transform: none; transition: none; }
+}
+.slide__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 28px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.slide__meta b { color: var(--accent); font-weight: 600; }
+
+h1, h2, h3 { margin: 0; letter-spacing: -.01em; line-height: 1.2; }
+h1 { font-size: clamp(32px, 5vw, 52px); font-weight: 700; }
+h2 { font-size: clamp(24px, 3.2vw, 34px); font-weight: 700; margin-bottom: 8px; }
+h3 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+.lede { font-size: clamp(16px, 1.8vw, 19px); color: var(--ink-2); max-width: 70ch; margin: 0 0 28px; }
+p { margin: 0 0 12px; }
+ul { margin: 0; padding-left: 20px; }
+li { margin: 4px 0; }
+.muted { color: var(--ink-3); }
+.small { font-size: 13px; }
+
+/* Title slide */
+.title-slide .slide__inner {
+  border-top: 6px solid var(--accent);
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+.title-foot { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; justify-content: space-between; margin-top: 40px; }
+.kv { display: flex; flex-wrap: wrap; gap: 28px; }
+.kv div span { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
+.kv div strong { font-weight: 600; }
+
+/* Verdict */
+.verdict {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: 10px;
+  padding: 14px 18px;
+  border: 1px solid currentColor;
+  max-width: 460px;
+}
+.verdict__label { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; }
+.verdict__value { font-size: 22px; font-weight: 700; }
+.verdict__why { font-size: 14px; color: var(--ink-2); }
+.verdict--build   { color: var(--good); background: var(--good-soft); }
+.verdict--smaller { color: var(--warn); background: var(--warn-soft); }
+.verdict--park    { color: var(--ink-2); background: var(--neutral-soft); }
+.verdict--no      { color: var(--bad);  background: var(--bad-soft); }
+
+/* Layout helpers */
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 820px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+.card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 18px;
+  background: var(--slide);
+}
+.card--accent { border-left: 4px solid var(--accent); }
+.card--bad { border-left: 4px solid var(--bad); }
+.callout {
+  border-radius: 10px;
+  padding: 14px 18px;
+  background: var(--accent-soft);
+  color: var(--ink);
+  margin: 20px 0 0;
+}
+.callout--bad { background: var(--bad-soft); }
+.callout strong { color: var(--accent); }
+.callout--bad strong { color: var(--bad); }
+
+/* Pills */
+.pill {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.pri--mvp, .tag--evidence, .sev--low { background: var(--good-soft); color: var(--good); }
+.pri--later, .tag--assumption, .sev--med { background: var(--warn-soft); color: var(--warn); }
+.pri--cut, .sev--high { background: var(--bad-soft); color: var(--bad); }
+.tag--speculative { background: var(--neutral-soft); color: var(--ink-2); }
+.over-budget { color: var(--bad); font-weight: 600; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); font-weight: 600; background: var(--neutral-soft); }
+tr:last-child td { border-bottom: 0; }
+td code, li code, p code { font: 500 12.5px/1.4 "JetBrains Mono", ui-monospace, monospace; background: var(--neutral-soft); padding: 1px 5px; border-radius: 4px; }
+
+/* Code */
+.code-block { margin: 0 0 18px; }
+.code-block__head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 13px; margin-bottom: 6px; }
+.code-block__path { font: 500 13px "JetBrains Mono", ui-monospace, monospace; color: var(--accent); }
+pre {
+  margin: 0;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  border-radius: 10px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  font: 400 13px/1.6 "JetBrains Mono", ui-monospace, monospace;
+}
+pre .add { color: #6fdc9b; }
+pre .del { color: #ff8b80; }
+pre .cm  { color: #7f8aa3; }
+
+/* Infra decisions */
+.decision { margin-bottom: 28px; }
+.decision__q { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; margin-bottom: 10px; }
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.option {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 600ms ease, background-color 600ms ease;
+  background: var(--slide);
+}
+.option:hover { border-color: var(--ink-3); }
+.option input { position: absolute; opacity: 0; pointer-events: none; }
+.option:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.option:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.option__name { font-weight: 600; margin-bottom: 8px; padding-right: 90px; }
+.option__rec { position: absolute; top: 14px; right: 14px; }
+.option__rec .pill { background: var(--accent); color: #fff; }
+.option dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 0 0 10px; font-size: 13px; }
+.option dt { color: var(--ink-3); }
+.option dd { margin: 0; }
+.option ul { font-size: 13px; padding-left: 16px; }
+.option .pros li::marker { content: "+  "; color: var(--good); }
+.option .cons li::marker { content: "−  "; color: var(--bad); }
+.picks-bar {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--line); padding-top: 18px; margin-top: 8px;
+}
+button {
+  font: 600 14px Inter, system-ui, sans-serif;
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: opacity 600ms ease;
+}
+button:hover { opacity: .88; }
+button.ghost { background: transparent; color: var(--ink-2); border: 1px solid var(--line); }
+#copy-status { font-size: 13px; color: var(--good); transition: opacity 900ms ease; opacity: 0; }
+#copy-status.show { opacity: 1; }
+
+/* Chrome */
+.progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--accent); width: 0; z-index: 10; transition: width 600ms ease; }
+.hud {
+  position: fixed; right: 16px; bottom: 16px; z-index: 10;
+  display: flex; gap: 8px; align-items: center;
+  background: var(--slide); border: 1px solid var(--line); border-radius: 999px;
+  padding: 6px 8px 6px 14px; box-shadow: var(--shadow); font-size: 13px; color: var(--ink-3);
+}
+.hud button { padding: 6px 10px; font-size: 13px; }
+
+@media print {
+  @page { size: 1280px 800px; margin: 0; }
+  html { scroll-snap-type: none; }
+  body { background: #fff; }
+  .slide { min-height: 800px; page-break-after: always; padding: 32px; }
+  .slide__inner { opacity: 1; transform: none; box-shadow: none; }
+  .progress, .hud, .picks-bar button { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<!-- 1. TITLE -->
+<section class="slide title-slide" id="s-title">
+  <div class="slide__inner">
+    <div>
+      <div class="eyebrow">Feature proposal · Hamstertours</div>
+      <h1>Ticking tasks off</h1>
+      <p class="lede" style="margin-top:16px">One tap marks a task done from anywhere. Each tick ends with a short, calm moment that shows how close the group is to being ready.</p>
+    </div>
+    <div class="title-foot">
+      <div class="kv">
+        <div><span>Date</span><strong>2026-10-11</strong></div>
+        <div><span>End user</span><strong>Solo tour operator, extremely low effort</strong></div>
+        <div><span>Scale</span><strong>1 user, tens of tasks a day (est.)</strong></div>
+      </div>
+      <div class="verdict verdict--smaller">
+        <span class="verdict__label">Verdict</span>
+        <span class="verdict__value">Build a smaller version</span>
+        <span class="verdict__why">Build the missing tick on the calendar and a calm "done" moment with group progress. Skip points, badges and streaks. Each tick stays one action, inside the effort budget.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. BRIEF DESCRIPTION -->
+<section class="slide" id="s-brief">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>01</b> Brief description</span><span>Ticking tasks off</span></div>
+    <h2>Tasks can be finished from two places, but not from the calendar</h2>
+    <p class="lede">Today the operator can only complete a task from a dashboard insight or a reminder email. On the Tasks calendar there is no tick at all, and done tasks look the same as open ones. Completing a task gets a 500ms fade on the dashboard and a plain "Done" page from email, with nothing in between. The proposal adds a one-tap tick everywhere a task appears and keeps done tasks visible but dimmed. Each tick ends with one quiet line of group progress.</p>
+    <div class="grid-3">
+      <div class="card card--accent">
+        <h3>Who</h3>
+        <p class="small">A solo tour operator who plans traveller groups and their to-dos. They use it daily and finish tasks from the dashboard, email and calendar alike.</p>
+      </div>
+      <div class="card card--accent">
+        <h3>Today they</h3>
+        <p class="small">Tick from the dashboard or email, or leave calendar tasks alone. Done and open tasks look the same on the calendar, so the week never looks cleared.</p>
+      </div>
+      <div class="card card--accent">
+        <h3>Effort budget</h3>
+        <p class="small">Zero setup and one deliberate action per tick. The reward has to come on its own, with nothing to read and nothing to turn on.</p>
+      </div>
+    </div>
+    <div class="callout callout--bad"><strong>Overlap:</strong> Completion already exists in the data and the API: <code>is_completed</code> plus <code>PATCH /tasks/:id</code>, the dashboard "Mark done" (<code>insight-item.tsx:70</code>) and the email Done button (<code>action.controller.ts:73</code>). Group history already logs <code>task-done</code> and shows "N open · M done". This proposal fills gaps. It is not a new system.</div>
+  </div>
+</section>
+
+<!-- 3. FEATURE LIST -->
+<section class="slide" id="s-features">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>02</b> Feature list</span><span>Ticking tasks off</span></div>
+    <h2>Three MVP pieces. The tick on the calendar is the product</h2>
+    <p class="lede">Ranked by what fills a real gap first. The reward pieces stay at zero extra actions. Game mechanics fail the quiet-satisfaction brief.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>What the end user experiences</th><th>End-user effort</th><th>Reuses</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Tick on the calendar</strong></td>
+            <td>A round tick on every task chip and a "Done" button in the task popover. Done tasks stay where they were, dimmed and struck through.</td>
+            <td>1 tap</td>
+            <td><code>useUpdateTask</code>, <code>Checkbox</code> (ui), <code>TaskChipContent</code> slot</td>
+            <td><span class="pill pri--mvp">MVP</span></td>
+          </tr>
+          <tr>
+            <td><strong>The done moment</strong></td>
+            <td>The tick draws in, the task settles to dimmed, and one line appears: "Rossi family · 6 of 8 ready", with Undo. It is the same on the calendar and the dashboard.</td>
+            <td>0 extra actions</td>
+            <td>Motion tokens, <code>use-leaving.ts</code>; new small notice in <code>@alexgrossi/ui</code></td>
+            <td><span class="pill pri--mvp">MVP</span></td>
+          </tr>
+          <tr>
+            <td><strong>Group progress</strong></td>
+            <td>Each group chip shows a thin fill for done / total. When the last task is done, the chip glows once, slowly, and says "Ready".</td>
+            <td>0 actions</td>
+            <td><code>GroupBar</code> <code>counts</code>, tasks query already loaded</td>
+            <td><span class="pill pri--mvp">MVP</span></td>
+          </tr>
+          <tr>
+            <td><strong>Email Done page shows progress</strong></td>
+            <td>After you press Done in a reminder email, the page also says "6 of 8 ready for the Rossi family".</td>
+            <td>0 extra actions</td>
+            <td><code>action.controller.ts:75</code>, <code>group_history</code> view</td>
+            <td><span class="pill pri--later">Later</span></td>
+          </tr>
+          <tr>
+            <td><strong>"Yesterday" line in the morning digest</strong></td>
+            <td>The digest opens with "Yesterday you finished 5 tasks."</td>
+            <td>0 actions, but it's one more line in an email they barely read</td>
+            <td><code>digest.content.ts</code>; needs <code>completed_at</code></td>
+            <td><span class="pill pri--later">Later</span></td>
+          </tr>
+          <tr>
+            <td><strong>Streaks</strong></td>
+            <td>"5 days in a row with everything done"</td>
+            <td class="over-budget">Turns into a duty, and punishes days off and the off-season</td>
+            <td>New</td>
+            <td><span class="pill pri--later">Later</span></td>
+          </tr>
+          <tr>
+            <td><strong>Points, badges, sound</strong></td>
+            <td>Scores and unlocks for ticking. You ruled out sound.</td>
+            <td class="over-budget">A new concept to learn; doesn't fit the notebook feel</td>
+            <td>New</td>
+            <td><span class="pill pri--cut">Cut</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 3b. MVP FEATURE DETAIL -->
+<section class="slide" id="s-features-detail">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>02</b> Feature detail</span><span>Ticking tasks off</span></div>
+    <h2>Each MVP piece works with no setup and is harmless if ignored</h2>
+    <div class="grid-3" style="margin-top:20px">
+      <div class="card">
+        <h3>Tick on the calendar</h3>
+        <ul class="small">
+          <li><strong>Trigger:</strong> tap the round tick on a chip, or "Done" in the popover.</li>
+          <li><strong>Behaviour:</strong> optimistic update through <code>useUpdateTask</code>. The chip dims and its title is struck through. Tapping again reopens the task.</li>
+          <li><strong>Empty state:</strong> no tasks means no ticks. Nothing new to explain.</li>
+          <li><strong>Error state:</strong> the existing rollback undoes the tick, and the notice says "Couldn't save. Try again."</li>
+          <li><strong>If ignored:</strong> the calendar behaves exactly as today.</li>
+          <li><strong>Pending tasks:</strong> the tick is hidden until the server returns the task, same as <code>editable</code>.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>The done moment</h3>
+        <ul class="small">
+          <li><strong>Trigger:</strong> any completion made in the app.</li>
+          <li><strong>Behaviour:</strong> the tick draws in over about 300ms and the chip fades to dimmed over about 400ms. A notice fades in at the bottom with group progress and Undo, then fades out after about 5s.</li>
+          <li><strong>Empty state:</strong> an ungrouped task shows "Done" with no count.</li>
+          <li><strong>Error state:</strong> the same notice switches to the failure text.</li>
+          <li><strong>If ignored:</strong> it leaves by itself, and nothing has to be dismissed.</li>
+          <li><strong>Reduced motion:</strong> opacity fades only.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Group progress</h3>
+        <ul class="small">
+          <li><strong>Trigger:</strong> always on, and recomputed from the tasks list.</li>
+          <li><strong>Behaviour:</strong> a thin fill under each group chip for done / total. On the last tick the chip glows once (about 4s, fading in from 0) and its label reads "Ready".</li>
+          <li><strong>Empty state:</strong> a group with no tasks shows no fill. It never shows 0 of 0.</li>
+          <li><strong>Error state:</strong> none of its own, because it only reads data that is already loaded.</li>
+          <li><strong>If ignored:</strong> passive. It never asks for anything.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. BENEFITS -->
+<section class="slide" id="s-benefits">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>03</b> Benefits</span><span>Ticking tasks off</span></div>
+    <h2>The calendar finally shows what is left. The reward part is unproven</h2>
+    <div class="grid-2" style="margin-top:20px">
+      <div>
+        <h3>For the end user</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Benefit</th><th>How we'd know</th><th>Basis</th></tr></thead>
+            <tbody>
+              <tr><td>Can finish a task where they are looking at it</td><td>Share of completions made from the calendar vs dashboard vs email (log the source on the PATCH)</td><td><span class="pill tag--evidence">Evidence</span></td></tr>
+              <tr><td>A week that looks cleared, not just shorter</td><td>Done tasks visible on the calendar. Fewer "is this done?" reopen-and-close cycles (<code>task-reopened</code> events)</td><td><span class="pill tag--assumption">Assumption</span></td></tr>
+              <tr><td>Feels progress per group ("6 of 8 ready")</td><td>Ask yourself after two weeks of use. No metric can measure the feeling</td><td><span class="pill tag--assumption">Assumption</span></td></tr>
+              <tr><td>Fewer stale open tasks</td><td>Open tasks older than their due date, before vs after (overdue count in <code>metric-row</code>)</td><td><span class="pill tag--assumption">Assumption</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3>For the business</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Benefit</th><th>How we'd know</th><th>Basis</th></tr></thead>
+            <tbody>
+              <tr><td>More accurate data for the briefing, digest and AI recaps, which all read <code>is_completed</code></td><td>Overdue items that were actually done drop out of the dashboard</td><td><span class="pill tag--assumption">Assumption</span></td></tr>
+              <tr><td>A reusable notice with Undo in <code>@alexgrossi/ui</code></td><td>Used by a second feature, e.g. delete or archive, within a month</td><td><span class="pill tag--assumption">Assumption</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 5. OPPORTUNITIES -->
+<section class="slide" id="s-opportunities">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>04</b> Opportunities</span><span>Ticking tasks off</span></div>
+    <h2>A completion timestamp opens up recaps. Nothing else depends on this</h2>
+    <p class="lede">What this could make possible later. None of it is in scope.</p>
+    <div class="grid-3">
+      <div class="card">
+        <span class="pill tag--speculative">Speculative</span>
+        <h3 style="margin-top:10px">Weekly recap</h3>
+        <p class="small">With <code>completed_at</code>, the dashboard or digest can say "23 done this week, Rossi family ready". It needs no new storage.</p>
+      </div>
+      <div class="card">
+        <span class="pill tag--speculative">Speculative</span>
+        <h3 style="margin-top:10px">"Ready" drives the departure view</h3>
+        <p class="small">The Departures panel could flag groups leaving soon that are not ready yet, using the same done / total count.</p>
+      </div>
+      <div class="card">
+        <span class="pill tag--speculative">Speculative</span>
+        <h3 style="margin-top:10px">Undo for every destructive action</h3>
+        <p class="small">The new notice can carry Undo for delete and archive, which today happen with no way back.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. TRADEOFFS -->
+<section class="slide" id="s-tradeoffs">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>05</b> Potential tradeoffs</span><span>Ticking tasks off</span></div>
+    <h2>The main risk is a tick that gets pressed by accident</h2>
+    <div class="table-wrap" style="margin-top:20px">
+      <table>
+        <thead><tr><th>Tradeoff</th><th>Why it matters</th><th>Severity</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Accidental ticks</strong></td><td>Chips are small and already respond to drag, resize and open-popover. A tick inside the chip competes with those, especially on mobile. A wrong tick also cancels the task's email reminder.</td><td><span class="pill sev--high">High</span></td><td>Show the tick only on hover or focus on desktop, and only in the popover on touch. Always offer Undo. The undo reopens the task, and the existing reminder logic reschedules it.</td></tr>
+          <tr><td><strong>Calendar package change</strong></td><td><code>CalendarEvent</code> has no way to style one event as done. A generic <code>dimmed</code> flag must be added to <code>@alexgrossi/calendar</code>, which has its own checks in CI.</td><td><span class="pill sev--med">Medium</span></td><td>Keep it generic (<code>dimmed?: boolean</code>), with no "task" concept in the package.</td></tr>
+          <tr><td><strong>Cluttered calendar</strong></td><td>Keeping done tasks visible means busy days stay crowded with grey chips.</td><td><span class="pill sev--med">Medium</span></td><td>Dim strongly (about 40% opacity). Hide done tasks in past weeks later if it bothers you.</td></tr>
+          <tr><td><strong>The reward wears off</strong></td><td>The same animation on the hundredth tick is noise. Reward design without variety fades within weeks (common product experience, not measured here).</td><td><span class="pill sev--med">Medium</span></td><td>Keep the per-tick moment small and save the visible moment for "group ready", which is rare.</td></tr>
+          <tr><td><strong>New migration</strong></td><td>Adding <code>completed_at</code> touches the shared tasks table and its history trigger. Old done tasks get no timestamp.</td><td><span class="pill sev--low">Low</span></td><td>Backfill from <code>group_events.at</code> where it exists and leave the rest null.</td></tr>
+          <tr><td><strong>Opportunity cost</strong></td><td>An estimated 1.5 to 2.5 days (basis: three UI touch points, one ui component, one small migration) not spent elsewhere, e.g. the dashboard's AI briefing, which is still a local mock.</td><td><span class="pill sev--low">Low</span></td><td>Ship the calendar tick first. It is half a day on its own and is the part that fills a real gap.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout--bad"><strong>Strongest case against:</strong> You are the only user and already know how much you got done. A "reward" layer on a solo work tool can feel like being patted on the head by your own software. The functional gap (no tick on the calendar) is worth half a day. Everything beyond it is polish whose value only you can judge, and only after using it.</div>
+  </div>
+</section>
+
+<!-- 7. CODE CHANGES -->
+<section class="slide" id="s-code">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>06</b> Code changes (samples)</span><span>Ticking tasks off</span></div>
+    <h2>Mostly extends the existing task mutation and calendar slots</h2>
+    <p class="lede">Illustrative excerpts, not the implementation.</p>
+    <div class="grid-2">
+      <div>
+        <div class="code-block">
+          <div class="code-block__head"><span class="code-block__path">calendar/src/core/events.ts</span><span class="pill pri--mvp">Extended</span></div>
+          <p class="small muted">A generic way to render one event as finished, with no task vocabulary in the package.</p>
+<pre><code>  <span class="cm">/** Overrides the calendar's `editable` for this event. */</span>
+  editable?: boolean
+<span class="add">+ /** Draws the event faded with a struck-through title, e.g. for finished work. */</span>
+<span class="add">+ dimmed?: boolean</span>
+  <span class="cm">/** Your own data. */</span>
+  data?: TData</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-block__head"><span class="code-block__path">hamstertours/src/features/tasks/components/tasks.main.tsx</span><span class="pill pri--mvp">Extended</span></div>
+          <p class="small muted">Done tasks stay on the calendar but look finished.</p>
+<pre><code>      calendarId: toCalendarId(task.groupId),
+      editable: !task.id.startsWith('pending-'),
+<span class="add">+     dimmed: task.isCompleted,</span>
+      data: task,</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-block__head"><span class="code-block__path">hamstertours/src/features/tasks/components/reminder-slots.tsx</span><span class="pill pri--mvp">Extended</span></div>
+          <p class="small muted">The chip slot already exists. The tick goes next to the reminder bell.</p>
+<pre><code>  &lt;EventChipContent title={event.title} timeLabel={timeLabel} variant={variant} /&gt;
+<span class="add">+ {task &amp;&amp; !task.id.startsWith('pending-') &amp;&amp; (</span>
+<span class="add">+   &lt;DoneTick checked={task.isCompleted} onChange={(done) =&gt; slot?.setDone(task.id, done)} /&gt;</span>
+<span class="add">+ )}</span>
+  {Bell &amp;&amp; task &amp;&amp; &lt;Bell task={task} … /&gt;}</code></pre>
+        </div>
+      </div>
+      <div>
+        <div class="code-block">
+          <div class="code-block__head"><span class="code-block__path">server/supabase/migrations/20261018000000_task_completed_at.sql</span><span class="pill pri--later">New</span></div>
+          <p class="small muted">Today only grouped tasks have a completion time (in <code>group_events</code>). Recaps need it on every task.</p>
+<pre><code>alter table public.tasks add column completed_at timestamptz;
+
+update public.tasks t set completed_at = e.at
+from public.group_events e
+where e.task_id = t.id and e.kind = 'task-done' and t.is_completed;
+<span class="cm">-- set / clear completed_at in the existing update trigger</span></code></pre>
+        </div>
+        <h3 style="margin-top:8px">Files touched</h3>
+        <div class="table-wrap">
+          <table>
+            <tbody>
+              <tr><td><code>ui/src/components/ui/molecules/notice.tsx</code> (fading notice with action)</td><td><span class="pill pri--later">New</span></td></tr>
+              <tr><td><code>server/supabase/migrations/…_task_completed_at.sql</code></td><td><span class="pill pri--later">New</span></td></tr>
+              <tr><td><code>calendar/src/core/events.ts</code> + chip styles</td><td><span class="pill pri--mvp">Extended</span></td></tr>
+              <tr><td><code>features/tasks/components/tasks.main.tsx</code>, <code>reminder-slots.tsx</code></td><td><span class="pill pri--mvp">Extended</span></td></tr>
+              <tr><td><code>features/groups/components/group-bar.tsx</code> (done / total fill)</td><td><span class="pill pri--mvp">Extended</span></td></tr>
+              <tr><td><code>features/dashboard/components/insight-item.tsx</code> (fires the done moment)</td><td><span class="pill pri--mvp">Extended</span></td></tr>
+              <tr><td><code>server/src/modules/tasks/task.service.ts</code> (<code>completedAt</code> in the row)</td><td><span class="pill pri--mvp">Extended</span></td></tr>
+              <tr><td><code>use-task-mutations.ts</code> <code>useUpdateTask</code>, <code>Checkbox</code>, motion tokens</td><td><span class="pill tag--speculative">Reused as-is</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. INFRASTRUCTURE DECISIONS -->
+<section class="slide" id="s-infra">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>07</b> Infrastructure decisions</span><span>Ticking tasks off</span></div>
+    <h2>Three small decisions. All stay on Supabase and the existing app</h2>
+    <p class="lede">Pick one option per decision. The recommendation is marked; the choice is yours.</p>
+
+    <div class="decision" data-decision="Recording when a task was done">
+      <div class="decision__q"><h3>Recording when a task was done</h3><span class="small muted">Needed for recaps and "yesterday" lines. It is not needed for the MVP visuals.</span></div>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="d1" value="Add completed_at column, set by the existing trigger">
+          <span class="option__rec"><span class="pill">Recommended</span></span>
+          <div class="option__name">Add a <code>completed_at</code> column</div>
+          <dl>
+            <dt>Cost</dt><dd>Free</dd>
+            <dt>Scale</dt><dd>Far beyond need</dd>
+            <dt>Setup</dt><dd>One migration, about 1h (est.)</dd>
+            <dt>Existing</dt><dd>Yes: tasks table and its trigger</dd>
+          </dl>
+          <ul class="pros"><li>Covers ungrouped tasks too</li><li>A plain column is simple to query for the digest</li></ul>
+          <ul class="cons"><li>Old done tasks only get a backfilled time where history exists</li></ul>
+        </label>
+        <label class="option">
+          <input type="radio" name="d1" value="Derive from group_events">
+          <div class="option__name">Read it from <code>group_events</code></div>
+          <dl>
+            <dt>Cost</dt><dd>Free</dd>
+            <dt>Scale</dt><dd>Fine</dd>
+            <dt>Setup</dt><dd>None</dd>
+            <dt>Existing</dt><dd>Yes: history trigger</dd>
+          </dl>
+          <ul class="pros"><li>No schema change</li></ul>
+          <ul class="cons"><li>Misses ungrouped tasks (<code>log_group_event</code> skips them)</li><li>Needs a join for every recap query</li></ul>
+        </label>
+        <label class="option">
+          <input type="radio" name="d1" value="Don't record it (defer)">
+          <div class="option__name">Don't record it yet</div>
+          <dl>
+            <dt>Cost</dt><dd>Free</dd>
+            <dt>Scale</dt><dd>n/a</dd>
+            <dt>Setup</dt><dd>None</dd>
+            <dt>Existing</dt><dd>n/a</dd>
+          </dl>
+          <ul class="pros"><li>The smallest MVP</li></ul>
+          <ul class="cons"><li>Completions made before the column exists never get an exact time</li></ul>
+        </label>
+      </div>
+    </div>
+
+    <div class="decision" data-decision="Where the done moment appears">
+      <div class="decision__q"><h3>Where the done moment appears</h3><span class="small muted">There is no toast or notice component today.</span></div>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="d2" value="New fading notice in @alexgrossi/ui">
+          <span class="option__rec"><span class="pill">Recommended</span></span>
+          <div class="option__name">New notice in <code>@alexgrossi/ui</code></div>
+          <dl>
+            <dt>Cost</dt><dd>Free</dd>
+            <dt>Scale</dt><dd>n/a</dd>
+            <dt>Setup</dt><dd>About half a day (est.)</dd>
+            <dt>Existing</dt><dd>Uses <code>motion</code> and the tokens already there</dd>
+          </dl>
+          <ul class="pros"><li>Matches your motion rules exactly</li><li>Reusable for Undo on delete and archive</li></ul>
+          <ul class="cons"><li>A component to own and maintain</li></ul>
+        </label>
+        <label class="option">
+          <input type="radio" name="d2" value="Inline on the task only">
+          <div class="option__name">Inline on the task only</div>
+          <dl>
+            <dt>Cost</dt><dd>Free</dd>
+            <dt>Scale</dt><dd>n/a</dd>
+            <dt>Setup</dt><dd>Smallest</dd>
+            <dt>Existing</dt><dd>Yes: chip and insight item</dd>
+          </dl>
+          <ul class="pros"><li>Nothing new to build</li></ul>
+          <ul class="cons"><li>No room for "6 of 8 ready" or Undo on a small chip</li></ul>
+        </label>
+        <label class="option">
+          <input type="radio" name="d2" value="Add the sonner library">
+          <div class="option__name">Add <code>sonner</code></div>
+          <dl>
+            <dt>Cost</dt><dd>Free (MIT)</dd>
+            <dt>Scale</dt><dd>n/a</dd>
+            <dt>Setup</dt><dd>About 1h, plus restyling</dd>
+            <dt>Existing</dt><dd>No: new dependency</dd>
+          </dl>
+          <ul class="pros"><li>Stacking, swipe and timing come built in</li></ul>
+          <ul class="cons"><li>Its default slide-in and stacking motion fights your fade-only rules</li></ul>
+        </label>
+      </div>
+    </div>
+
+    <div class="decision" data-decision="Where group progress counts come from">
+      <div class="decision__q"><h3>Where group progress counts come from</h3><span class="small muted">The source of done / total per group.</span></div>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="d3" value="Derive from the tasks query already loaded">
+          <span class="option__rec"><span class="pill">Recommended</span></span>
+          <div class="option__name">Count from the loaded tasks</div>
+          <dl>
+            <dt>Cost</dt><dd>Free</dd>
+            <dt>Scale</dt><dd>Fine up to thousands of tasks</dd>
+            <dt>Setup</dt><dd>Minutes, next to <code>counts</code></dd>
+            <dt>Existing</dt><dd>Yes: tasks query, open counts</dd>
+          </dl>
+          <ul class="pros"><li>Updates instantly with the optimistic tick</li></ul>
+          <ul class="cons"><li>The server email page still needs its own count (the <code>group_history</code> view has one)</li></ul>
+        </label>
+        <label class="option">
+          <input type="radio" name="d3" value="Read group_history view via endpoint">
+          <div class="option__name">Read the <code>group_history</code> view</div>
+          <dl>
+            <dt>Cost</dt><dd>Free</dd>
+            <dt>Scale</dt><dd>Fine</dd>
+            <dt>Setup</dt><dd>One query, about 1h</dd>
+            <dt>Existing</dt><dd>Yes: <code>open_tasks</code>/<code>done_tasks</code></dd>
+          </dl>
+          <ul class="pros"><li>One source of truth for the app and email</li></ul>
+          <ul class="cons"><li>Lags the optimistic tick until the refetch, so the reward feels late</li></ul>
+        </label>
+      </div>
+    </div>
+
+    <div class="picks-bar">
+      <span class="small muted" id="picks-summary">No decisions picked yet.</span>
+      <span style="display:flex;gap:10px;align-items:center">
+        <span id="copy-status">Copied</span>
+        <button class="ghost" type="button" id="reset-picks">Reset</button>
+        <button type="button" id="copy-picks">Copy my decisions</button>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- 9. CONCLUSION -->
+<section class="slide" id="s-conclusion">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>08</b> Conclusion</span><span>Ticking tasks off</span></div>
+    <h2>Ship the calendar tick, then one calm "done" moment with group progress</h2>
+    <p class="lede">The missing tick on the calendar is a real gap and costs about half a day. The reward is worth a small, quiet layer that saves its one visible moment for "group ready", not a game system.</p>
+    <div class="grid-3">
+      <div class="card card--bad">
+        <h3>Cut</h3>
+        <ul class="small"><li>Points and badges. They are a new concept to learn and clash with the notebook feel.</li><li>Sound (ruled out by you).</li><li>Streaks for now. They punish days off and the off-season for a solo operator.</li></ul>
+      </div>
+      <div class="card">
+        <h3>Open questions</h3>
+        <ul class="small"><li>On a touch screen, should the tick appear on the chip at all, or only in the popover?</li><li>Should done tasks in past weeks fade further or hide?</li><li>Should the email Done page show progress in this round or later?</li></ul>
+      </div>
+      <div class="card card--accent">
+        <h3>Next step</h3>
+        <p class="small">Pick the three options on the previous slide. Then build the calendar tick with the <code>dimmed</code> flag first and commit it on its own, before the notice and the group fill.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hud" aria-label="Slide navigation">
+  <span id="counter">1 / 1</span>
+  <button class="ghost" type="button" id="prev" aria-label="Previous slide">↑</button>
+  <button class="ghost" type="button" id="next" aria-label="Next slide">↓</button>
+  <button class="ghost" type="button" id="theme" aria-label="Toggle theme">◐</button>
+</div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var counter = document.getElementById('counter');
+  var progress = document.getElementById('progress');
+  var current = 0;
+
+  function store(key, value) {
+    try {
+      if (value === undefined) return localStorage.getItem(key);
+      if (value === null) localStorage.removeItem(key); else localStorage.setItem(key, value);
+    } catch (e) { return null; }
+  }
+
+  function setCurrent(i) {
+    current = i;
+    counter.textContent = (i + 1) + ' / ' + slides.length;
+    progress.style.width = ((i + 1) / slides.length * 100) + '%';
+  }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-visible');
+          if (e.intersectionRatio > 0.5) setCurrent(slides.indexOf(e.target));
+        }
+      });
+    }, { threshold: [0.15, 0.55] });
+    slides.forEach(function (s) { io.observe(s); });
+  } else {
+    slides.forEach(function (s) { s.classList.add('is-visible'); });
+  }
+  setCurrent(0);
+
+  function go(delta) {
+    var i = Math.max(0, Math.min(slides.length - 1, current + delta));
+    slides[i].scrollIntoView({ behavior: 'smooth' });
+  }
+  document.getElementById('prev').addEventListener('click', function () { go(-1); });
+  document.getElementById('next').addEventListener('click', function () { go(1); });
+  document.addEventListener('keydown', function (e) {
+    if (e.target.closest && e.target.closest('input, textarea')) return;
+    if (['ArrowDown', 'PageDown', 'ArrowRight', ' '].indexOf(e.key) > -1) { e.preventDefault(); go(1); }
+    if (['ArrowUp', 'PageUp', 'ArrowLeft'].indexOf(e.key) > -1) { e.preventDefault(); go(-1); }
+  });
+
+  // Theme toggle
+  var root = document.documentElement;
+  var savedTheme = store('proposal-theme');
+  if (savedTheme) root.setAttribute('data-theme', savedTheme);
+  document.getElementById('theme').addEventListener('click', function () {
+    var dark = root.getAttribute('data-theme')
+      ? root.getAttribute('data-theme') === 'dark'
+      : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var next = dark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    store('proposal-theme', next);
+  });
+
+  // Infrastructure picks
+  var picksKey = 'proposal-picks:' + location.pathname;
+  var decisions = Array.prototype.slice.call(document.querySelectorAll('.decision'));
+  var summary = document.getElementById('picks-summary');
+
+  function readPicks() {
+    return decisions.map(function (d) {
+      var checked = d.querySelector('input:checked');
+      return { decision: d.getAttribute('data-decision'), choice: checked ? checked.value : null };
+    });
+  }
+  function render() {
+    var picks = readPicks();
+    var done = picks.filter(function (p) { return p.choice; }).length;
+    summary.textContent = done === 0
+      ? 'No decisions picked yet.'
+      : done + ' of ' + picks.length + ' decisions picked.';
+    store(picksKey, JSON.stringify(picks));
+  }
+  try {
+    var saved = JSON.parse(store(picksKey) || '[]');
+    saved.forEach(function (p, i) {
+      if (!p.choice || !decisions[i]) return;
+      decisions[i].querySelectorAll('input').forEach(function (input) {
+        if (input.value === p.choice) input.checked = true;
+      });
+    });
+  } catch (e) {}
+  decisions.forEach(function (d) { d.addEventListener('change', render); });
+  render();
+
+  document.getElementById('reset-picks').addEventListener('click', function () {
+    document.querySelectorAll('.decision input').forEach(function (i) { i.checked = false; });
+    render();
+  });
+
+  document.getElementById('copy-picks').addEventListener('click', function () {
+    var lines = ['Infrastructure decisions for "' + document.title.replace(/ Proposal$/, '') + '":'];
+    readPicks().forEach(function (p) {
+      lines.push('- ' + p.decision + ': ' + (p.choice || 'UNDECIDED'));
+    });
+    var text = lines.join('\n');
+    var status = document.getElementById('copy-status');
+    function flash() {
+      status.classList.add('show');
+      setTimeout(function () { status.classList.remove('show'); }, 2500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(flash, function () { window.prompt('Copy your decisions:', text); });
+    } else {
+      window.prompt('Copy your decisions:', text);
+    }
+  });
+})();
+</script>
+</body>
+</html>

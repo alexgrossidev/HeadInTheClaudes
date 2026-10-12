@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notes Tab Proposal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!--
+  idea-proposal deck template.
+  Fill every {{PLACEHOLDER}}. Duplicate or delete sample rows/cards as needed.
+  Keep the structure, classes and script. Escape < > & inside <pre><code>.
+  Verdict classes: verdict--build | verdict--smaller | verdict--park | verdict--no
+  Severity classes: sev--high | sev--med | sev--low
+  Priority classes: pri--mvp | pri--later | pri--cut
+  Tag classes: tag--evidence | tag--assumption | tag--speculative
+-->
+<style>
+:root {
+  --bg: #f4f5f7;
+  --slide: #ffffff;
+  --ink: #14171f;
+  --ink-2: #4a5161;
+  --ink-3: #7b8394;
+  --line: #e3e6ec;
+  --accent: #1f4fd1;
+  --accent-soft: #e8eefc;
+  --good: #11804a;
+  --good-soft: #e3f4ea;
+  --warn: #a35d00;
+  --warn-soft: #fbf0dd;
+  --bad: #b42318;
+  --bad-soft: #fde8e6;
+  --neutral-soft: #eef0f3;
+  --code-bg: #0f1420;
+  --code-ink: #d7deea;
+  --shadow: 0 1px 2px rgba(16, 24, 40, .06), 0 8px 24px rgba(16, 24, 40, .06);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b0d12;
+    --slide: #141821;
+    --ink: #eef1f6;
+    --ink-2: #b4bbc8;
+    --ink-3: #808999;
+    --line: #262c38;
+    --accent: #7b9cff;
+    --accent-soft: #1b2440;
+    --good: #4cc98a;
+    --good-soft: #13281e;
+    --warn: #f0b252;
+    --warn-soft: #2d2311;
+    --bad: #ff7a6e;
+    --bad-soft: #321613;
+    --neutral-soft: #1c212b;
+    --code-bg: #0a0d14;
+    --code-ink: #d7deea;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .3);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0b0d12;
+  --slide: #141821;
+  --ink: #eef1f6;
+  --ink-2: #b4bbc8;
+  --ink-3: #808999;
+  --line: #262c38;
+  --accent: #7b9cff;
+  --accent-soft: #1b2440;
+  --good: #4cc98a;
+  --good-soft: #13281e;
+  --warn: #f0b252;
+  --warn-soft: #2d2311;
+  --bad: #ff7a6e;
+  --bad-soft: #321613;
+  --neutral-soft: #1c212b;
+  --code-bg: #0a0d14;
+  --code-ink: #d7deea;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .3);
+}
+
+* { box-sizing: border-box; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 16px/1.55 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Slides */
+.slide {
+  scroll-snap-align: start;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px 72px;
+}
+.slide__inner {
+  width: 100%;
+  max-width: 1120px;
+  background: var(--slide);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: clamp(24px, 4vw, 56px);
+  position: relative;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 900ms ease, transform 900ms ease;
+}
+.slide.is-visible .slide__inner { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .slide__inner { opacity: 1; transform: none; transition: none; }
+}
+.slide__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 28px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.slide__meta b { color: var(--accent); font-weight: 600; }
+
+h1, h2, h3 { margin: 0; letter-spacing: -.01em; line-height: 1.2; }
+h1 { font-size: clamp(32px, 5vw, 52px); font-weight: 700; }
+h2 { font-size: clamp(24px, 3.2vw, 34px); font-weight: 700; margin-bottom: 8px; }
+h3 { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
+.lede { font-size: clamp(16px, 1.8vw, 19px); color: var(--ink-2); max-width: 70ch; margin: 0 0 28px; }
+p { margin: 0 0 12px; }
+ul { margin: 0; padding-left: 20px; }
+li { margin: 4px 0; }
+.muted { color: var(--ink-3); }
+.small { font-size: 13px; }
+
+/* Title slide */
+.title-slide .slide__inner {
+  border-top: 6px solid var(--accent);
+  min-height: 60vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+.title-foot { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; justify-content: space-between; margin-top: 40px; }
+.kv { display: flex; flex-wrap: wrap; gap: 28px; }
+.kv div span { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-3); }
+.kv div strong { font-weight: 600; }
+
+/* Verdict */
+.verdict {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: 10px;
+  padding: 14px 18px;
+  border: 1px solid currentColor;
+  max-width: 460px;
+}
+.verdict__label { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; font-weight: 600; }
+.verdict__value { font-size: 22px; font-weight: 700; }
+.verdict__why { font-size: 14px; color: var(--ink-2); }
+.verdict--build   { color: var(--good); background: var(--good-soft); }
+.verdict--smaller { color: var(--warn); background: var(--warn-soft); }
+.verdict--park    { color: var(--ink-2); background: var(--neutral-soft); }
+.verdict--no      { color: var(--bad);  background: var(--bad-soft); }
+
+/* Layout helpers */
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 820px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+.card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 18px;
+  background: var(--slide);
+}
+.card--accent { border-left: 4px solid var(--accent); }
+.card--bad { border-left: 4px solid var(--bad); }
+.callout {
+  border-radius: 10px;
+  padding: 14px 18px;
+  background: var(--accent-soft);
+  color: var(--ink);
+  margin: 20px 0 0;
+}
+.callout--bad { background: var(--bad-soft); }
+.callout strong { color: var(--accent); }
+.callout--bad strong { color: var(--bad); }
+
+/* Pills */
+.pill {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.pri--mvp, .tag--evidence, .sev--low { background: var(--good-soft); color: var(--good); }
+.pri--later, .tag--assumption, .sev--med { background: var(--warn-soft); color: var(--warn); }
+.pri--cut, .sev--high { background: var(--bad-soft); color: var(--bad); }
+.tag--speculative { background: var(--neutral-soft); color: var(--ink-2); }
+.over-budget { color: var(--bad); font-weight: 600; }
+
+/* Tables */
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); font-weight: 600; background: var(--neutral-soft); }
+tr:last-child td { border-bottom: 0; }
+td code, li code, p code { font: 500 12.5px/1.4 "JetBrains Mono", ui-monospace, monospace; background: var(--neutral-soft); padding: 1px 5px; border-radius: 4px; }
+
+/* Code */
+.code-block { margin: 0 0 18px; }
+.code-block__head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 13px; margin-bottom: 6px; }
+.code-block__path { font: 500 13px "JetBrains Mono", ui-monospace, monospace; color: var(--accent); }
+pre {
+  margin: 0;
+  background: var(--code-bg);
+  color: var(--code-ink);
+  border-radius: 10px;
+  padding: 16px 18px;
+  overflow-x: auto;
+  font: 400 13px/1.6 "JetBrains Mono", ui-monospace, monospace;
+}
+pre .add { color: #6fdc9b; }
+pre .del { color: #ff8b80; }
+pre .cm  { color: #7f8aa3; }
+
+/* Infra decisions */
+.decision { margin-bottom: 28px; }
+.decision__q { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline; margin-bottom: 10px; }
+.options { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+.option {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 600ms ease, background-color 600ms ease;
+  background: var(--slide);
+}
+.option:hover { border-color: var(--ink-3); }
+.option input { position: absolute; opacity: 0; pointer-events: none; }
+.option:has(input:checked) { border-color: var(--accent); background: var(--accent-soft); }
+.option:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.option__name { font-weight: 600; margin-bottom: 8px; padding-right: 90px; }
+.option__rec { position: absolute; top: 14px; right: 14px; }
+.option__rec .pill { background: var(--accent); color: #fff; }
+.option dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin: 0 0 10px; font-size: 13px; }
+.option dt { color: var(--ink-3); }
+.option dd { margin: 0; }
+.option ul { font-size: 13px; padding-left: 16px; }
+.option .pros li::marker { content: "+  "; color: var(--good); }
+.option .cons li::marker { content: "−  "; color: var(--bad); }
+.picks-bar {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+  border-top: 1px solid var(--line); padding-top: 18px; margin-top: 8px;
+}
+button {
+  font: 600 14px Inter, system-ui, sans-serif;
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: opacity 600ms ease;
+}
+button:hover { opacity: .88; }
+button.ghost { background: transparent; color: var(--ink-2); border: 1px solid var(--line); }
+#copy-status { font-size: 13px; color: var(--good); transition: opacity 900ms ease; opacity: 0; }
+#copy-status.show { opacity: 1; }
+
+/* Chrome */
+.progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--accent); width: 0; z-index: 10; transition: width 600ms ease; }
+.hud {
+  position: fixed; right: 16px; bottom: 16px; z-index: 10;
+  display: flex; gap: 8px; align-items: center;
+  background: var(--slide); border: 1px solid var(--line); border-radius: 999px;
+  padding: 6px 8px 6px 14px; box-shadow: var(--shadow); font-size: 13px; color: var(--ink-3);
+}
+.hud button { padding: 6px 10px; font-size: 13px; }
+
+@media print {
+  @page { size: 1280px 800px; margin: 0; }
+  html { scroll-snap-type: none; }
+  body { background: #fff; }
+  .slide { min-height: 800px; page-break-after: always; padding: 32px; }
+  .slide__inner { opacity: 1; transform: none; box-shadow: none; }
+  .progress, .hud, .picks-bar button { display: none; }
+}
+</style>
+</head>
+<body>
+<div class="progress" id="progress"></div>
+
+<!-- 1. TITLE -->
+<section class="slide title-slide" id="s-title">
+  <div class="slide__inner">
+    <div>
+      <div class="eyebrow">Feature proposal · Hamstertours</div>
+      <h1>Notes tab</h1>
+      <p class="lede" style="margin-top:16px">A sidebar tab of short, categorised notes. Links open in one click and text snippets copy in one click, so routine bookings like hotels stop depending on bookmarks and memory.</p>
+    </div>
+    <div class="title-foot">
+      <div class="kv">
+        <div><span>Date</span><strong>2026-10-11</strong></div>
+        <div><span>End user</span><strong>Solo tour operator, extremely low effort</strong></div>
+        <div><span>Scale</span><strong>1 user, tens to low hundreds of notes (est.)</strong></div>
+      </div>
+      <div class="verdict verdict--build">
+        <span class="verdict__label">Verdict</span>
+        <span class="verdict__value">Build it, kept small</span>
+        <span class="verdict__why">It's cheap: one table, one route, and one feature folder, all following existing patterns. Writing a note is extra work up front, but it pays off from the second time the note is used.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 2. BRIEF DESCRIPTION -->
+<section class="slide" id="s-brief">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>01</b> Brief description</span><span>Notes tab</span></div>
+    <h2>The booking routine lives in bookmarks and the operator's head</h2>
+    <p class="lede">The operator repeats the same operations every week: booking hotels, writing to suppliers, finding the same login pages. The links are in browser bookmarks, and the rest (standard request text, which site is for which city, who to call) lives in their head. Nothing in the app holds this. The proposal adds a Notes tab to the sidebar: notes with a free-form category, a copy button, and clickable links.</p>
+    <div class="grid-3">
+      <div class="card card--accent">
+        <h3>Who</h3>
+        <p class="small">A solo tour operator planning traveller groups. Uses the app daily and won't read instructions or configure anything.</p>
+      </div>
+      <div class="card card--accent">
+        <h3>Today they</h3>
+        <p class="small">Use browser bookmarks plus memory. Standard texts are retyped or dug out of old emails.</p>
+      </div>
+      <div class="card card--accent">
+        <h3>Effort budget</h3>
+        <p class="small">Zero setup, one deliberate action. A note must be usable with just a title or body; the category is optional.</p>
+      </div>
+    </div>
+    <div class="callout callout--bad"><strong>Overlap:</strong> Browser bookmarks already do the "open a link" half, and groups already have a free-text <code>notes</code> field (<code>server/supabase/migrations/20261011000000_create_groups.sql</code>). Group notes belong to one departure, though, so they can't hold reusable routines. The UI library also has an unused <code>CommandPalette</code>, and the login page already promises "⌘K anywhere".</div>
+  </div>
+</section>
+
+<!-- 3. FEATURE LIST -->
+<section class="slide" id="s-features">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>02</b> Feature list</span><span>Notes tab</span></div>
+    <h2>Three MVP pieces. The categorised list is the product</h2>
+    <p class="lede">Ranked by your "ship only one thing" answer. Everything that needs a second concept (steps, templates, AI) waits.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Feature</th><th>What the end user experiences</th><th>End-user effort</th><th>Reuses</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Notes tab with categories</strong></td>
+            <td>"Notes" under Records in the sidebar. Notes are listed under their category heading; uncategorised notes go under "General".</td>
+            <td>1 click to open; "New note" + type. Category optional.</td>
+            <td><code>features/sidebar/components/sidebar.tsx</code>, groups module pattern</td>
+            <td><span class="pill pri--mvp">MVP</span></td>
+          </tr>
+          <tr>
+            <td><strong>Free-form category, typed inline</strong></td>
+            <td>A category field with suggestions from the categories already in use. Typing a new name creates it.</td>
+            <td>0 if skipped; 1 field otherwise</td>
+            <td><code>Combobox</code> in <code>@alexgrossi/ui/molecules</code></td>
+            <td><span class="pill pri--mvp">MVP</span></td>
+          </tr>
+          <tr>
+            <td><strong>One-click copy and open</strong></td>
+            <td>Each note has a copy button. URLs in the text are clickable and open in a new tab.</td>
+            <td>1 click per use</td>
+            <td><code>navigator.clipboard</code> as in <code>draft-messages-modal.tsx:57</code></td>
+            <td><span class="pill pri--mvp">MVP</span></td>
+          </tr>
+          <tr>
+            <td><strong>Search box</strong></td>
+            <td>Filters notes by text as you type.</td>
+            <td>Optional</td>
+            <td><code>SearchInput</code> molecule, client-side filter</td>
+            <td><span class="pill pri--later">Later</span></td>
+          </tr>
+          <tr>
+            <td><strong>⌘K to reach notes from anywhere</strong></td>
+            <td>The palette lists notes; Enter copies or opens one without leaving the page.</td>
+            <td>2 keys + type</td>
+            <td><code>CommandPalette</code> organism (built, unused)</td>
+            <td><span class="pill pri--later">Later</span></td>
+          </tr>
+          <tr>
+            <td><strong>Pin a note to the dashboard</strong></td>
+            <td>The most-used notes show on the morning dashboard.</td>
+            <td class="over-budget">Decide what to pin: over budget unless automatic</td>
+            <td>Dashboard feature</td>
+            <td><span class="pill pri--later">Later</span></td>
+          </tr>
+          <tr>
+            <td><strong>Checklists / playbooks</strong></td>
+            <td>A note becomes steps you tick through.</td>
+            <td class="over-budget">New concept + per-step clicks</td>
+            <td>New</td>
+            <td><span class="pill pri--cut">Cut</span></td>
+          </tr>
+          <tr>
+            <td><strong>AI-picked category</strong></td>
+            <td>The existing classifier labels each note.</td>
+            <td>0, but can mislabel</td>
+            <td><code>server/src/modules/classifications</code></td>
+            <td><span class="pill pri--cut">Cut</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- 3b. MVP FEATURE DETAIL -->
+<section class="slide" id="s-features-detail">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>02</b> Feature detail</span><span>Notes tab</span></div>
+    <h2>Each MVP piece works with no setup and is harmless if ignored</h2>
+    <div class="grid-3" style="margin-top:20px">
+      <div class="card">
+        <h3>Notes tab with categories</h3>
+        <ul class="small">
+          <li><strong>Trigger:</strong> Clicking "Notes" in the sidebar.</li>
+          <li><strong>Behaviour:</strong> Notes are grouped by category, most recently edited first. "New note" adds an empty card in edit mode, and it autosaves.</li>
+          <li><strong>Empty state:</strong> One line, "Save a link or text you reuse, like your hotel booking site.", with the New note button.</li>
+          <li><strong>Error state:</strong> A failed save keeps the text in the card and shows an inline retry. Nothing is lost.</li>
+          <li><strong>If ignored:</strong> Nothing happens; the tab just sits in the sidebar.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Free-form category</h3>
+        <ul class="small">
+          <li><strong>Trigger:</strong> The category field on a note.</li>
+          <li><strong>Behaviour:</strong> Suggests existing categories. A new name is created on save. Renaming a category means editing the notes in it (no category screen).</li>
+          <li><strong>Empty state:</strong> No category means the note shows under "General".</li>
+          <li><strong>Error state:</strong> Same as the note save.</li>
+          <li><strong>If ignored:</strong> Everything sits under "General", which still works for a dozen notes.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>One-click copy and open</h3>
+        <ul class="small">
+          <li><strong>Trigger:</strong> The copy button, or a link in the note body.</li>
+          <li><strong>Behaviour:</strong> Copy puts the full body on the clipboard, and the button fades to a tick. Links open in a new tab.</li>
+          <li><strong>Empty state:</strong> No copy button on an empty note.</li>
+          <li><strong>Error state:</strong> If clipboard access is denied, the body text is selected so ⌘C works.</li>
+          <li><strong>If ignored:</strong> Notes are still readable as plain text.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. BENEFITS -->
+<section class="slide" id="s-benefits">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>03</b> Benefits</span><span>Notes tab</span></div>
+    <h2>Routine bookings get faster, but only if notes get written</h2>
+    <div class="grid-2" style="margin-top:20px">
+      <div>
+        <h3>For the end user</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Benefit</th><th>How we'd know</th><th>Basis</th></tr></thead>
+            <tbody>
+              <tr><td>Standard texts aren't retyped</td><td>Copy clicks per week; more than 3 means it's in use</td><td><span class="pill tag--assumption">Assumption</span></td></tr>
+              <tr><td>Booking links are in the same place as the groups they're for</td><td>Link clicks from notes per week</td><td><span class="pill tag--assumption">Assumption</span></td></tr>
+              <tr><td>Fewer things to remember</td><td>Number of notes after 2 weeks; 10 or more means they're being kept</td><td><span class="pill tag--assumption">Assumption</span></td></tr>
+              <tr><td>Today's routine relies on bookmarks and memory</td><td>Stated in the interview</td><td><span class="pill tag--evidence">Evidence</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <h3>For the business</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Benefit</th><th>How we'd know</th><th>Basis</th></tr></thead>
+            <tbody>
+              <tr><td>The app becomes the place work starts, not just where tasks are logged</td><td>Sessions that open Notes before Tasks</td><td><span class="pill tag--assumption">Assumption</span></td></tr>
+              <tr><td>Stickier: notes are work you'd lose by leaving</td><td>Notes per user over time</td><td><span class="pill tag--assumption">Assumption</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <p class="small muted" style="margin-top:16px">No usage tracking exists today. Each metric needs either a counter column or a log line; without one, all of these stay assumptions.</p>
+  </div>
+</section>
+
+<!-- 5. OPPORTUNITIES -->
+<section class="slide" id="s-opportunities">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>04</b> Opportunities</span><span>Notes tab</span></div>
+    <h2>Gives the unused ⌘K palette a first real job</h2>
+    <p class="lede">What this could make possible later. None of it is in scope.</p>
+    <div class="grid-3">
+      <div class="card">
+        <span class="pill tag--speculative">Speculative</span>
+        <h3 style="margin-top:10px">⌘K becomes real</h3>
+        <p class="small">The login page already promises "⌘K anywhere". Notes are the first content worth searching from anywhere, and the palette is already built.</p>
+      </div>
+      <div class="card">
+        <span class="pill tag--speculative">Speculative</span>
+        <h3 style="margin-top:10px">Notes into draft messages</h3>
+        <p class="small">The dashboard's draft-message feature could pull a standard text from a note instead of generating it.</p>
+      </div>
+      <div class="card">
+        <span class="pill tag--speculative">Speculative</span>
+        <h3 style="margin-top:10px">Link a note to a task</h3>
+        <p class="small">A "book hotel" task could show the hotel note next to it. This needs a note id on tasks; nothing is built toward it now.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. TRADEOFFS -->
+<section class="slide" id="s-tradeoffs">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>05</b> Potential tradeoffs</span><span>Notes tab</span></div>
+    <h2>The main risk is an empty tab: the value depends on the user writing first</h2>
+    <div class="table-wrap" style="margin-top:20px">
+      <table>
+        <thead><tr><th>Tradeoff</th><th>Why it matters</th><th>Severity</th><th>Mitigation</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Cold start</strong></td><td>Unlike every other feature in the app, notes give nothing until the operator writes them, which costs effort the profile says they won't spend.</td><td><span class="pill sev--high">High</span></td><td>The empty state suggests one concrete first note. Adding a note is one click with no required field. No mitigation for the user who never starts.</td></tr>
+          <tr><td><strong>Loses to bookmarks for links</strong></td><td>Bookmarks are one click from any tab; notes are one click plus a tab switch. For pure links, notes are slower.</td><td><span class="pill sev--med">Medium</span></td><td>Pitch notes as "link + the text that goes with it". ⌘K (Later) closes the gap.</td></tr>
+          <tr><td><strong>Free-form categories drift</strong></td><td>"Hotels", "hotel", "Hotels Rome" become three headings over time.</td><td><span class="pill sev--med">Medium</span></td><td>Suggest existing categories as they type; match case-insensitively. No rename screen in the MVP.</td></tr>
+          <tr><td><strong>Sensitive data in plain text</strong></td><td>"Shortcuts for booking" invites login details and card numbers. These would sit unencrypted in Supabase.</td><td><span class="pill sev--med">Medium</span></td><td>An empty-state line says to keep passwords in a password manager. Same RLS-locked, server-only access as groups.</td></tr>
+          <tr><td><strong>Another table, module and route</strong></td><td>About 10 new files across server and app, plus an e2e route entry. Small, but permanent upkeep.</td><td><span class="pill sev--low">Low</span></td><td>Copy the groups module one-for-one; no new pattern to learn.</td></tr>
+          <tr><td><strong>Opportunity cost</strong></td><td>The task completion proposal (2026-10-11) is mid-flight. Notes don't touch tasks, but they compete for the same time.</td><td><span class="pill sev--low">Low</span></td><td>Ship after the calendar tick lands.</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout--bad"><strong>Strongest case against:</strong> The operator already has a working system (bookmarks plus memory) and the profile says they won't build a new habit. A notes tab that stays empty costs nothing to run but adds sidebar clutter and a module to maintain. Make it worth trying by pairing it with ⌘K soon after.</div>
+  </div>
+</section>
+
+<!-- 7. CODE CHANGES -->
+<section class="slide" id="s-code">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>06</b> Code changes (samples)</span><span>Notes tab</span></div>
+    <h2>A copy of the groups module, one table smaller</h2>
+    <p class="lede">Illustrative excerpts, not the implementation.</p>
+    <div class="grid-2">
+      <div>
+        <div class="code-block">
+          <div class="code-block__head"><span class="code-block__path">server/supabase/migrations/20261018000000_create_notes.sql</span><span class="pill pri--later">New</span></div>
+          <p class="small muted">Same shape and RLS stance as groups. The category is a column, not a table.</p>
+<pre><code><span class="cm">-- Reusable snippets and links, e.g. "Hotels / Booking.com partner login".</span>
+create table public.notes (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null,
+  title text check (char_length(title) &lt;= 120),
+  body text not null default '' check (char_length(body) &lt;= 10000),
+  <span class="cm">-- Free-form. Null shows under "General".</span>
+  category text check (char_length(category) between 1 and 40),
+  is_deleted boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+alter table public.notes enable row level security;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-block__head"><span class="code-block__path">server/src/modules/notes/note.routes.ts</span><span class="pill pri--later">New</span></div>
+          <p class="small muted">Mirrors <code>group.routes.ts</code> exactly.</p>
+<pre><code>router.use('/notes', requireAuth)
+router.get('/notes', handle((req) =&gt; controller.list(authenticatedUser(req))))
+router.post('/notes', handle((req) =&gt; controller.create(authenticatedUser(req), req.body)))
+router.patch('/notes/:id', handle((req) =&gt; controller.update(authenticatedUser(req), req.params, req.body)))
+router.delete('/notes/:id', handle((req) =&gt; controller.delete(authenticatedUser(req), req.params)))</code></pre>
+        </div>
+      </div>
+      <div>
+        <div class="code-block">
+          <div class="code-block__head"><span class="code-block__path">hamstertours/src/features/sidebar/components/sidebar.tsx</span><span class="pill pri--mvp">Extended</span></div>
+          <p class="small muted">One item next to History.</p>
+<pre><code>&lt;SidebarGroup label="Records"&gt;
+  &lt;SidebarItem asChild icon={&lt;History /&gt;} label="History" … /&gt;
+<span class="add">+ &lt;SidebarItem asChild icon={&lt;NotebookPen /&gt;} label="Notes" active={!!matchRoute({ to: '/notes' })}&gt;</span>
+<span class="add">+   &lt;Link to="/notes" /&gt;</span>
+<span class="add">+ &lt;/SidebarItem&gt;</span>
+&lt;/SidebarGroup&gt;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-block__head"><span class="code-block__path">hamstertours/src/features/notes/api/notes-api.ts</span><span class="pill pri--later">New</span></div>
+          <p class="small muted">Same query pattern as <code>groups-api.ts</code>.</p>
+<pre><code>export const notesQuery = queryOptions({
+  queryKey: ['notes'],
+  queryFn: () =&gt; api&lt;Note[]&gt;('/notes'),
+})</code></pre>
+        </div>
+        <h3 style="margin-top:8px">Files touched</h3>
+        <div class="table-wrap">
+          <table>
+            <tbody>
+              <tr><td><code>server/supabase/migrations/…_create_notes.sql</code></td><td><span class="pill pri--later">New</span></td></tr>
+              <tr><td><code>server/src/modules/notes/*</code> (routes, controller, service, schemas, response)</td><td><span class="pill pri--later">New</span></td></tr>
+              <tr><td><code>server/src/app.ts</code></td><td><span class="pill pri--mvp">Extended</span></td></tr>
+              <tr><td><code>hamstertours/src/features/notes/*</code></td><td><span class="pill pri--later">New</span></td></tr>
+              <tr><td><code>hamstertours/src/routes/_authenticated/notes.tsx</code></td><td><span class="pill pri--later">New</span></td></tr>
+              <tr><td><code>hamstertours/src/features/sidebar/components/sidebar.tsx</code></td><td><span class="pill pri--mvp">Extended</span></td></tr>
+              <tr><td><code>hamstertours/e2e/console.spec.ts</code></td><td><span class="pill pri--mvp">Extended</span></td></tr>
+              <tr><td><code>@alexgrossi/ui</code> Combobox, Card, Button</td><td><span class="pill tag--speculative">Reused as-is</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. INFRASTRUCTURE DECISIONS -->
+<section class="slide" id="s-infra">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>07</b> Infrastructure decisions</span><span>Notes tab</span></div>
+    <h2>Three small decisions. All stay on Supabase and the existing app</h2>
+    <p class="lede">Pick one option per decision. The recommendation is marked; the choice is yours.</p>
+
+    <div class="decision" data-decision="Where notes are stored">
+      <div class="decision__q"><h3>Where notes are stored</h3><span class="small muted">Which store holds notes, and whether they follow you across devices</span></div>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="d1" value="New Supabase table behind the Express API">
+          <span class="option__rec"><span class="pill">Recommended</span></span>
+          <div class="option__name">New Supabase table behind the Express API</div>
+          <dl>
+            <dt>Cost</dt><dd>Free tier; a few KB per user (est.)</dd>
+            <dt>Scale</dt><dd>Far beyond need</dd>
+            <dt>Setup</dt><dd>1 migration + 1 module</dd>
+            <dt>Existing</dt><dd>Yes: same as groups</dd>
+          </dl>
+          <ul class="pros"><li>Syncs across devices</li><li>Same auth and RLS stance</li></ul>
+          <ul class="cons"><li>About 10 new files</li></ul>
+        </label>
+        <label class="option">
+          <input type="radio" name="d1" value="Browser localStorage only">
+          <div class="option__name">Browser localStorage only</div>
+          <dl>
+            <dt>Cost</dt><dd>Free</dd>
+            <dt>Scale</dt><dd>One browser</dd>
+            <dt>Setup</dt><dd>Smallest</dd>
+            <dt>Existing</dt><dd>No server change</dd>
+          </dl>
+          <ul class="pros"><li>Ships in a day</li></ul>
+          <ul class="cons"><li>Lost on a new device or cleared data</li><li>Not on the phone</li></ul>
+        </label>
+        <label class="option">
+          <input type="radio" name="d1" value="Reuse groups (a hidden Library group)">
+          <div class="option__name">Reuse groups (a hidden "Library" group)</div>
+          <dl>
+            <dt>Cost</dt><dd>Free</dd>
+            <dt>Scale</dt><dd>Fine</dd>
+            <dt>Setup</dt><dd>No migration</dd>
+            <dt>Existing</dt><dd>Yes, but bent</dd>
+          </dl>
+          <ul class="pros"><li>No new table</li></ul>
+          <ul class="cons"><li>One text blob, no categories</li><li>Leaks into history, calendar and digest</li></ul>
+        </label>
+      </div>
+    </div>
+
+    <div class="decision" data-decision="How categories are modelled">
+      <div class="decision__q"><h3>How categories are modelled</h3><span class="small muted">Free-form was chosen; this decides the storage</span></div>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="d2" value="Text column on the note">
+          <span class="option__rec"><span class="pill">Recommended</span></span>
+          <div class="option__name">Text column on the note</div>
+          <dl>
+            <dt>Cost</dt><dd>Free</dd>
+            <dt>Scale</dt><dd>Fine to thousands</dd>
+            <dt>Setup</dt><dd>One column</dd>
+            <dt>Existing</dt><dd>Yes</dd>
+          </dl>
+          <ul class="pros"><li>Typing a name creates the category</li><li>No category screen</li></ul>
+          <ul class="cons"><li>Renaming means editing each note</li></ul>
+        </label>
+        <label class="option">
+          <input type="radio" name="d2" value="Separate categories table">
+          <div class="option__name">Separate categories table</div>
+          <dl>
+            <dt>Cost</dt><dd>Free</dd>
+            <dt>Scale</dt><dd>Fine</dd>
+            <dt>Setup</dt><dd>Extra table + endpoints</dd>
+            <dt>Existing</dt><dd>No</dd>
+          </dl>
+          <ul class="pros"><li>Rename, colour and order later</li></ul>
+          <ul class="cons"><li>Twice the backend for a field most people skip</li></ul>
+        </label>
+      </div>
+    </div>
+
+    <div class="decision" data-decision="Note body format">
+      <div class="decision__q"><h3>Note body format</h3><span class="small muted">What the operator types into</span></div>
+      <div class="options">
+        <label class="option">
+          <input type="radio" name="d3" value="Plain text, URLs auto-linked">
+          <span class="option__rec"><span class="pill">Recommended</span></span>
+          <div class="option__name">Plain text, URLs auto-linked</div>
+          <dl>
+            <dt>Cost</dt><dd>Free</dd>
+            <dt>Scale</dt><dd>n/a</dd>
+            <dt>Setup</dt><dd>A textarea + a link regex</dd>
+            <dt>Existing</dt><dd>Yes: like group notes</dd>
+          </dl>
+          <ul class="pros"><li>Copies cleanly into emails and booking forms</li><li>No new dependency</li></ul>
+          <ul class="cons"><li>No bold or lists</li></ul>
+        </label>
+        <label class="option">
+          <input type="radio" name="d3" value="Markdown">
+          <div class="option__name">Markdown</div>
+          <dl>
+            <dt>Cost</dt><dd>Free</dd>
+            <dt>Scale</dt><dd>n/a</dd>
+            <dt>Setup</dt><dd>A renderer dependency</dd>
+            <dt>Existing</dt><dd>No</dd>
+          </dl>
+          <ul class="pros"><li>Lists and headings</li></ul>
+          <ul class="cons"><li>Copied text carries ** and #</li><li>Syntax to learn</li></ul>
+        </label>
+        <label class="option">
+          <input type="radio" name="d3" value="Rich text editor">
+          <div class="option__name">Rich text editor</div>
+          <dl>
+            <dt>Cost</dt><dd>Free (OSS)</dd>
+            <dt>Scale</dt><dd>n/a</dd>
+            <dt>Setup</dt><dd>Large dependency, styling work</dd>
+            <dt>Existing</dt><dd>No</dd>
+          </dl>
+          <ul class="pros"><li>Familiar toolbar</li></ul>
+          <ul class="cons"><li>Heaviest option for "super simple"</li></ul>
+        </label>
+      </div>
+    </div>
+
+    <div class="picks-bar">
+      <span class="small muted" id="picks-summary">No decisions picked yet.</span>
+      <span style="display:flex;gap:10px;align-items:center">
+        <span id="copy-status">Copied</span>
+        <button class="ghost" type="button" id="reset-picks">Reset</button>
+        <button type="button" id="copy-picks">Copy my decisions</button>
+      </span>
+    </div>
+  </div>
+</section>
+
+<!-- 9. CONCLUSION -->
+<section class="slide" id="s-conclusion">
+  <div class="slide__inner">
+    <div class="slide__meta"><span><b>08</b> Conclusion</span><span>Notes tab</span></div>
+    <h2>Ship the categorised notes tab with copy and open; add ⌘K next</h2>
+    <p class="lede">It's small and follows patterns already in the repo, and it covers the routine the interview described. The risk is that the tab stays empty, and making ⌘K reach notes is the cheapest fix for that.</p>
+    <div class="grid-3">
+      <div class="card card--bad">
+        <h3>Cut</h3>
+        <ul class="small">
+          <li>Checklists/playbooks: a second concept, and more clicks than the profile allows</li>
+          <li>AI categories: free-form was chosen, and mislabels would erode trust</li>
+          <li>A category management screen</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Open questions</h3>
+        <ul class="small">
+          <li>Should notes be usable on the phone during the day, or is desktop enough?</li>
+          <li>Should deleting a note be undoable, or is a confirm enough?</li>
+        </ul>
+      </div>
+      <div class="card card--accent">
+        <h3>Next step</h3>
+        <p class="small">Pick the three options, then build in this order: migration, server module, notes feature + route, sidebar item. One commit each.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="hud" aria-label="Slide navigation">
+  <span id="counter">1 / 1</span>
+  <button class="ghost" type="button" id="prev" aria-label="Previous slide">↑</button>
+  <button class="ghost" type="button" id="next" aria-label="Next slide">↓</button>
+  <button class="ghost" type="button" id="theme" aria-label="Toggle theme">◐</button>
+</div>
+
+<script>
+(function () {
+  var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
+  var counter = document.getElementById('counter');
+  var progress = document.getElementById('progress');
+  var current = 0;
+
+  function store(key, value) {
+    try {
+      if (value === undefined) return localStorage.getItem(key);
+      if (value === null) localStorage.removeItem(key); else localStorage.setItem(key, value);
+    } catch (e) { return null; }
+  }
+
+  function setCurrent(i) {
+    current = i;
+    counter.textContent = (i + 1) + ' / ' + slides.length;
+    progress.style.width = ((i + 1) / slides.length * 100) + '%';
+  }
+
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-visible');
+          if (e.intersectionRatio > 0.5) setCurrent(slides.indexOf(e.target));
+        }
+      });
+    }, { threshold: [0.15, 0.55] });
+    slides.forEach(function (s) { io.observe(s); });
+  } else {
+    slides.forEach(function (s) { s.classList.add('is-visible'); });
+  }
+  setCurrent(0);
+
+  function go(delta) {
+    var i = Math.max(0, Math.min(slides.length - 1, current + delta));
+    slides[i].scrollIntoView({ behavior: 'smooth' });
+  }
+  document.getElementById('prev').addEventListener('click', function () { go(-1); });
+  document.getElementById('next').addEventListener('click', function () { go(1); });
+  document.addEventListener('keydown', function (e) {
+    if (e.target.closest && e.target.closest('input, textarea')) return;
+    if (['ArrowDown', 'PageDown', 'ArrowRight', ' '].indexOf(e.key) > -1) { e.preventDefault(); go(1); }
+    if (['ArrowUp', 'PageUp', 'ArrowLeft'].indexOf(e.key) > -1) { e.preventDefault(); go(-1); }
+  });
+
+  // Theme toggle
+  var root = document.documentElement;
+  var savedTheme = store('proposal-theme');
+  if (savedTheme) root.setAttribute('data-theme', savedTheme);
+  document.getElementById('theme').addEventListener('click', function () {
+    var dark = root.getAttribute('data-theme')
+      ? root.getAttribute('data-theme') === 'dark'
+      : window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var next = dark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    store('proposal-theme', next);
+  });
+
+  // Infrastructure picks
+  var picksKey = 'proposal-picks:' + location.pathname;
+  var decisions = Array.prototype.slice.call(document.querySelectorAll('.decision'));
+  var summary = document.getElementById('picks-summary');
+
+  function readPicks() {
+    return decisions.map(function (d) {
+      var checked = d.querySelector('input:checked');
+      return { decision: d.getAttribute('data-decision'), choice: checked ? checked.value : null };
+    });
+  }
+  function render() {
+    var picks = readPicks();
+    var done = picks.filter(function (p) { return p.choice; }).length;
+    summary.textContent = done === 0
+      ? 'No decisions picked yet.'
+      : done + ' of ' + picks.length + ' decisions picked.';
+    store(picksKey, JSON.stringify(picks));
+  }
+  try {
+    var saved = JSON.parse(store(picksKey) || '[]');
+    saved.forEach(function (p, i) {
+      if (!p.choice || !decisions[i]) return;
+      decisions[i].querySelectorAll('input').forEach(function (input) {
+        if (input.value === p.choice) input.checked = true;
+      });
+    });
+  } catch (e) {}
+  decisions.forEach(function (d) { d.addEventListener('change', render); });
+  render();
+
+  document.getElementById('reset-picks').addEventListener('click', function () {
+    document.querySelectorAll('.decision input').forEach(function (i) { i.checked = false; });
+    render();
+  });
+
+  document.getElementById('copy-picks').addEventListener('click', function () {
+    var lines = ['Infrastructure decisions for "' + document.title.replace(/ Proposal$/, '') + '":'];
+    readPicks().forEach(function (p) {
+      lines.push('- ' + p.decision + ': ' + (p.choice || 'UNDECIDED'));
+    });
+    var text = lines.join('\n');
+    var status = document.getElementById('copy-status');
+    function flash() {
+      status.classList.add('show');
+      setTimeout(function () { status.classList.remove('show'); }, 2500);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(flash, function () { window.prompt('Copy your decisions:', text); });
+    } else {
+      window.prompt('Copy your decisions:', text);
+    }
+  });
+})();
+</script>
+</body>
+</html>
