@@ -1,0 +1,9 @@
+{
+  "name": "devsecops",
+  "description": "Harden an npm repository on GitHub to a chosen security level (1-5) and deliver every change as a single pull request.",
+  "version": "0.1.0",
+  "author": {
+    "name": "alexgrossidev"
+  },
+  "license": "MIT"
+}

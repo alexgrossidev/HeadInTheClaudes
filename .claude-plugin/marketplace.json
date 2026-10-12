@@ -11,6 +11,16 @@
       "name": "system-design",
       "source": "./system-design",
       "description": "Candid system-design evaluations of technologies: advantages, limitations, tradeoffs, and a structured rating."
+    },
+    {
+      "name": "devsecops",
+      "source": "./devsecops",
+      "description": "Harden an npm repository on GitHub to a chosen security level (1-5) and deliver every change as a single pull request."
+    },
+    {
+      "name": "product",
+      "source": "./product",
+      "description": "Turn a rough feature idea into an honest proposal deck: features, benefits, tradeoffs, sample code changes, infrastructure options and a blunt verdict."
     }
   ]
 }

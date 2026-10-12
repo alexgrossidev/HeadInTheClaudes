@@ -9,7 +9,8 @@ Each top-level folder is a **domain**, packaged as a Claude Code plugin. Each do
 | Domain | Skill | What it does |
 | --- | --- | --- |
 | [system-design](system-design/) | [system-design-specialist](system-design/skills/system-design-specialist/) | Name a technology and get a candid assessment: advantages, limitations, tradeoffs, and a 1–5 rating per dimension. |
-| tdd | *(coming soon)* | |
+| [devsecops](devsecops/) | [repo-devsecops](devsecops/skills/repo-devsecops/) | Pick a security level from 1 to 5 and get an npm repo on GitHub hardened in a single pull request: Dependabot, secret scanning, dependency review, install-script allowlists, Socket, trusted publishing and more. |
+| [product](product/) | [idea-proposal](product/skills/idea-proposal/) | A fun little skill i used in personal projects. Run `/idea-proposal <idea>` and get an HTML proposal deck built from your repo and a short plain-language interview: features, benefits, tradeoffs, sample code changes, infrastructure options and a blunt verdict. |
 
 ## Install
 
@@ -18,6 +19,8 @@ Each top-level folder is a **domain**, packaged as a Claude Code plugin. Each do
 ```
 /plugin marketplace add alexgrossidev/HeadInTheClaudes
 /plugin install system-design@head-in-the-claudes
+/plugin install devsecops@head-in-the-claudes
+/plugin install product@head-in-the-claudes
 ```
 
 ### As local skills (for hacking on them)

@@ -1,0 +1,9 @@
+{
+  "name": "product",
+  "description": "Turn a rough feature idea into an honest proposal deck: features, benefits, tradeoffs, sample code changes, infrastructure options and a blunt verdict.",
+  "version": "0.1.0",
+  "author": {
+    "name": "alexgrossidev"
+  },
+  "license": "MIT"
+}
